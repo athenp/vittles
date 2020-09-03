@@ -5,6 +5,7 @@ import vuetify from './plugins/vuetify';
 import store from './store'
 
 Vue.config.productionTip = false
+Vue.config.keyCodes.comma = 188
 
 new Vue({
   router,
