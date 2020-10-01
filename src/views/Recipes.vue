@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import npyjs from '/Users/athenpellicci/Desktop/vittles/node_modules/npyjs/index.js'
+import * as npyjs from 'npyjs'
 
 export default {
   computed: {
