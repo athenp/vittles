@@ -17,11 +17,9 @@
             height="100px"
             color="#bc5f43"
             :placeholder = "placeholderText"
-            
-            
           ></v-text-field>
           <v-chip
-            v-for="(ingredient, index) in ingredients" :key="index"
+            v-for="(ingredient, index) in ingredientInput" :key="index"
             class = "ma-1"
             close
             color="white"
@@ -39,12 +37,13 @@
             {{ currentSuggestion }}
             <v-icon size="18px" right>mdi-help-circle</v-icon>
           </v-chip>
+          <div>{{ }}</div>
         </v-row>
       </v-container>
     </v-main>
     <v-btn 
-      v-if="this.ingredients.length > 0"
-      @click="$router.push({path: '/recipes'})"
+      v-if="this.ingredientInput.length > 0"
+      @click = "passValues()"
       block
       tile 
       max-height="48px" 
@@ -52,11 +51,22 @@
       color="#bc5f43"
     >SEARCH
     </v-btn>
+    <v-app-bar
+      v-else
+      app
+      bottom
+      dense
+      flat
+      :style="{background: $vuetify.theme.themes[theme].secondary}"
+      style="margin-bottom:48px"
+    >
+      <v-toolbar-title class="ticker">HI</v-toolbar-title>
+    </v-app-bar>
   </v-app>
 </template>
 
 <script>
-import Matter from '/Users/athenpellicci/Desktop/vittles/node_modules/matter-js/build/matter.js'
+// import Matter from '/Users/athenpellicci/Desktop/vittles/node_modules/matter-js/build/matter.js'
 import json from '@/data/ingredients.json'
 
   export default {
@@ -74,7 +84,7 @@ import json from '@/data/ingredients.json'
       currVal: 0,
       cycleRan: false,
       placeholderText: "WHATCHA GOT?",
-      ingredients: [],
+      ingredientInput: [],
       ingredientData: json,
       currentSuggestion: "",
     }),
@@ -123,51 +133,55 @@ import json from '@/data/ingredients.json'
       },
       autocomplete: function() {
         if (this.model != "") {
-          this.currentSuggestion = this.ingredientData.find(a =>a.toLowerCase().includes(this.model.toLowerCase().replace(/,\s*$/, "")));
+          this.currentSuggestion = this.ingredientData.find(a =>a.includes(this.model.toLowerCase().replace(/,\s*$/, "")));
         }
       },
       addIngredient: function() {
         if (this.model != "") {
           //this.model = this.model.replace(/,\s*$/, "");
-          this.ingredients.push(this.currentSuggestion);
+          this.ingredientInput.push(this.currentSuggestion);
           this.model = "";
           //this.addShape();
         }
       },
       removeIngredient: function(index) {
-        this.ingredients.splice(index, 1);
+        this.ingredientInput.splice(index, 1);
       },
-      addShape: function() {
-          // module aliases
-        var Engine = Matter.Engine,
-            Render = Matter.Render,
-            World = Matter.World,
-            Bodies = Matter.Bodies;
+      passValues: function() {
+        this.$store.commit("changeIngredients", this.ingredientInput);
+        this.$router.push({path: '/recipes'});
+      },
+      // addShape: function() {
+      //     // module aliases
+      //   var Engine = Matter.Engine,
+      //       Render = Matter.Render,
+      //       World = Matter.World,
+      //       Bodies = Matter.Bodies;
 
-        // create an engine
-        var engine = Engine.create();
+      //   // create an engine
+      //   var engine = Engine.create();
 
-        // create a renderer
-        var render = Render.create({
-            element: document.getElementById("main_stuff"),
-            engine: engine,
-            background: 'transparent'
-        });
+      //   // create a renderer
+      //   var render = Render.create({
+      //       element: document.getElementById("main_stuff"),
+      //       engine: engine,
+      //       background: 'transparent'
+      //   });
 
-        // create two boxes and a ground
-        var boxA = Bodies.rectangle(400, 200, 80, 80);
-        var boxB = Bodies.rectangle(450, 50, 80, 80);
-        var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
+      //   // create two boxes and a ground
+      //   var boxA = Bodies.rectangle(400, 200, 80, 80);
+      //   var boxB = Bodies.rectangle(450, 50, 80, 80);
+      //   var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
 
-        // add all of the bodies to the world
-        World.add(engine.world, [boxA, boxB, ground]);
+      //   // add all of the bodies to the world
+      //   World.add(engine.world, [boxA, boxB, ground]);
 
-        // run the engine
-        Engine.run(engine);
+      //   // run the engine
+      //   Engine.run(engine);
 
-        // run the renderer
-        Render.run(render);
-      }
+      //   // run the renderer
+      //   Render.run(render);
+      // }
     },
     created() {
       this.interval = setInterval(() => this.cycleHomeText(), 2000);
@@ -195,5 +209,40 @@ h1 {
 }
 .theme--light.v-input input, .theme--light.v-input textarea {
   color: #bc5f43 !important;
+}
+.ticker {
+  position: absolute;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  /* Starting position */
+  -moz-transform:translateX(100%);
+  -webkit-transform:translateX(100%);	
+  transform:translateX(100%);
+  /* Apply animation to this element */	
+  -moz-animation: scroll-left 15s linear infinite;
+  -webkit-animation: scroll-left 15s linear infinite;
+  animation: scroll-left 15s linear infinite;
+}
+/* Move it (define the animation) */
+@-moz-keyframes scroll-left {
+  0%   { -moz-transform: translateX(100%); }
+  100% { -moz-transform: translateX(-100%); }
+}
+@-webkit-keyframes scroll-left {
+  0%   { -webkit-transform: translateX(100%); }
+  100% { -webkit-transform: translateX(-100%); }
+}
+@keyframes scroll-left {
+  0%   { 
+    -moz-transform: translateX(100%); /* Browser bug fix */
+    -webkit-transform: translateX(100%); /* Browser bug fix */
+    transform: translateX(100%); 		
+  }
+  100% { 
+    -moz-transform: translateX(-100%); /* Browser bug fix */
+    -webkit-transform: translateX(-100%); /* Browser bug fix */
+    transform: translateX(-100%); 
+  }
 }
 </style>
